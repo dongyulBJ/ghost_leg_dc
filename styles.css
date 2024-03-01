@@ -35,11 +35,11 @@ body {
   display: flex;
   align-items: center;
   flex-direction: column;
-  background: #ffe259; /* fallback for old browsers */
+  background: #ff9dd; /* fallback for old browsers */
   background: -webkit-linear-gradient(
     to right,
-    #ffe259,
-    #ffc021
+    #ffffff,
+    #fff9dd
   ); /* Chrome 10-25, Safari 5.1-6 */
   background: linear-gradient(
     to right,
