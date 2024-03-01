@@ -1,0 +1,444 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+  <head>
+    <title>사다리 게임</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=euc-kr" />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dongle&family=Gasoek+One&display=swap"
+      rel="stylesheet"
+    />
+    <script language="javascript" type="text/javascript">
+      var Yl = {
+        getEl: function (strId) {
+          if (document.getElementById) return document.getElementById(strId);
+          if (document.all) return document.all[strId];
+        },
+        //div 리턴
+        getDiv: function (sWidth, sHeight, sBgColor) {
+          var d = document.createElement("div");
+          if (sWidth) d.style.width = sWidth;
+          if (sHeight) d.style.height = sHeight;
+          if (sBgColor) d.style.backgroundColor = sBgColor;
+          d.style.position = "absolute";
+          d.style.overflow = "hidden";
+
+          return d;
+        },
+        arrColor: [
+          "#DB3D3D", //빨
+          "#FF9808", // 주
+          "#FFE900", // 노
+          "#52DC2C", // 초
+          "#3D61DB", // 파
+          "#963DDB", // 보
+          "#963DDB",
+          "#8f0197",
+          "#156200",
+          "#9ca53b",
+          "#c9a601",
+          "#d6006d",
+          "#01b6de",
+          "#80adaf",
+          "#a44201",
+          "#e0b800",
+          "#ec0078",
+          "#0021b0",
+          "#92b7d7",
+          "#013add",
+        ],
+
+        arrVerDiv: [], //수직 선 div
+        arrHorDiv: [], //수평 선 div
+        arrMovDiv: [], //이동 선 div
+
+        arrIng: [], //진행여부 체크용
+
+        arrMDiv: [], //이동선 배열 번호값 저장, 이동후 확인용
+
+        // nMaxWidth: 1000, //최고 넓이
+        nMaxWidth: this.window.innerWidth / 1, //최고 넓이
+        nWidth: 0, //사다리 넓이
+        // nHeight: 300, //사다리 높이
+        nHeight:
+          this.window.innerHeight / 1.25 -
+          (this.window.innerWidth / 100) * 16 -
+          30, //사다리 높이
+
+        nNum: 0,
+        retryCount: 0,
+        MaxRetry: 500,
+
+        arrTopDiv: [], //탑 div
+        arrBotDiv: [], //아래 div
+        arrGoDiv: [], //go 버튼 div
+
+        init: function () {
+          //갯수
+          this.nNum = 6;
+          //넓이
+          this.nWidth = parseInt(this.nMaxWidth / this.nNum);
+
+          for (var i = 0; i < this.nNum; i++) {
+            this.arrTopDiv[i] = this.getDiv(this.nWidth + "px", "100px", "");
+            this.arrBotDiv[i] = this.getDiv(this.nWidth + "px", "100px", "");
+            this.arrGoDiv[i] = this.getDiv(this.nWidth + "px", "0px", "");
+
+            this.arrTopDiv[i].style.left = i * this.nWidth + "px";
+            // this.arrTopDiv[i].style.top = 1 / this.nWidth + 100 + "px";
+            this.arrTopDiv[i].style.top = "40px";
+
+            this.arrBotDiv[i].style.left = i * this.nWidth + "px";
+            // this.arrBotDiv[i].style.top = "410px";
+            this.arrBotDiv[i].style.top = this.nHeight + 200 + "px";
+
+            this.arrGoDiv[i].style.left = i * this.nWidth + "px";
+            this.arrGoDiv[i].style.top = "70px";
+            // this.arrTopDiv[i].style.fontSize = "15px";
+            this.arrBotDiv[i].style.fontSize = "15px";
+
+            //this.arrTopDiv[i].style.border = "1px solid #CCCCCC";
+            //this.arrBotDiv[i].style.border = "1px solid #CCCCCC";
+
+            this.arrTopDiv[i].align = "center";
+            this.arrBotDiv[i].align = "center";
+            this.arrGoDiv[i].align = "center";
+
+            // this.arrTopDiv[i].innerHTML =
+            //   i +
+            //   1 +
+            //   '<br><input type="text" id="inp_top_' +
+            //   i +
+            //   '" value="" style="width:90%" tabindex="' +
+            //   (i + 1) +
+            //   '" />';
+            // this.arrBotDiv[i].innerHTML =
+            //   '<input type="text" id="inp_bot_' +
+            //   i +
+            //   '" value="" style="width:90%" tabindex="' +
+            //   (i + 1 + 50) +
+            //   '" />';
+
+            this.getEl("div_body").appendChild(this.arrTopDiv[i]);
+            this.getEl("div_body").appendChild(this.arrBotDiv[i]);
+            this.getEl("div_body").appendChild(this.arrGoDiv[i]);
+
+            this.arrVerDiv[i] = this.getDiv("5px", this.nHeight + "px", "#444");
+
+            this.arrVerDiv[i].style.left =
+              i * this.nWidth + parseInt(this.nWidth / 2) + "px";
+            // 사다리 위치
+            this.arrVerDiv[i].style.top = "140px";
+
+            this.getEl("div_body").appendChild(this.arrVerDiv[i]);
+          }
+
+          //   this.getEl("div_step1").style.display = "none";
+          //   this.getEl("div_step2").style.display = "";
+          Yl.create();
+        },
+        create: function () {
+          //사다리 생성
+          console.log("nHeight:", this.nHeight);
+          for (var i = 0; i < this.nNum; i++) {
+            // this.arrTopDiv[i].innerHTML = this.getEl("inp_top_" + i).value;
+            this.arrTopDiv[i].innerHTML =
+              '<input class="go_btn"  type="button" value="' +
+              this.getEl("inp_top_" + i).value +
+              '" onClick="Yl.allStart()">';
+            // '<input class="go_btn"  type="button" value="' +
+            // this.getEl("inp_top_" + i).value +
+            // '" onClick="Yl.start(' +
+            // i +
+            // ')">';
+
+            //   i + 1 + "<br>" + this.getEl("inp_top_" + i).value;
+            // this.arrBotDiv[i].innerHTML = this.getEl("inp_bot_" + i).value;
+            this.arrBotDiv[i].innerHTML =
+              '<div class="result">' +
+              this.getEl("inp_bot_" + i).value +
+              "</div>";
+            // this.arrGoDiv[i].innerHTML =
+            //   '<input class="go_btn" type="button" value="GO" onClick="Yl.start(' +
+            //   i +
+            //   ')">';
+
+            this.arrTopDiv[i].style.overflow = "auto";
+            this.arrBotDiv[i].style.overflow = "auto";
+
+            this.arrIng[i] = false;
+
+            this.arrMDiv[i] = [];
+          }
+
+          // const nRndNumber = nHeight
+
+          for (var i = 0; i < this.nNum * 5; i++) {
+            var nLen = this.arrHorDiv.length;
+
+            this.arrHorDiv[nLen] = this.getDiv(
+              this.nWidth + "px",
+              "5px",
+              "#444"
+            );
+
+            var nRndLeft =
+              parseInt(Math.random() * (this.nNum - 1)) * this.nWidth +
+              parseInt(this.nWidth / 2);
+            var nRndTop = this.getRndTop();
+            if (nRndTop) {
+              this.arrHorDiv[nLen].style.left = nRndLeft + "px";
+              this.arrHorDiv[nLen].style.top = nRndTop + "px";
+
+              this.getEl("div_body").appendChild(this.arrHorDiv[nLen]);
+            }
+          }
+
+          //   this.getEl("div_step2").innerHTML = "GO 버튼을 눌러 주세요.";
+        },
+        sRndTop: "",
+
+        // 랜덤 사다리
+        getRndTop: function () {
+          var minDistance = 20; // 최소 거리
+
+          var nRnd = parseInt(Math.random() * (this.nHeight - 200)) + 240;
+          for (var i = 0; i < this.arrHorDiv.length; i++) {
+            var existingTop = parseInt(this.arrHorDiv[i].style.top);
+            if (Math.abs(existingTop - nRnd) < minDistance) {
+              // 만약 너무 거리가 가까우면 다시 실행
+              if (Yl.retryCount <= Yl.MaxRetry) {
+                Yl.retryCount = Yl.retryCount + 1;
+                return this.getRndTop();
+              } else {
+                return null;
+              }
+            }
+          }
+          Yl.retryCount = 0;
+          return nRnd;
+          //   if (this.sRndTop.indexOf("[" + nRnd + "]") < 0) {
+          //     this.sRndTop += "[" + nRnd + "]";
+          //     return nRnd;
+          //   } else {
+          //     return this.getRndTop();
+          //   }
+        },
+
+        start: function (no) {
+          if (this.arrIng[no]) {
+            for (var i = 0; i < this.arrMDiv.length; i++) {
+              for (var j = 0; j < this.arrMDiv[i].length; j++) {
+                this.arrMovDiv[this.arrMDiv[i][j]].style.backgroundColor =
+                  "#CCCCCC";
+                this.arrMovDiv[this.arrMDiv[i][j]].style.zIndex = 1;
+              }
+            }
+            for (var i = 0; i < this.arrMDiv[no].length; i++) {
+              this.arrMovDiv[this.arrMDiv[no][i]].style.backgroundColor =
+                "#0000ff";
+              this.arrMovDiv[this.arrMDiv[no][i]].style.zIndex = 2;
+            }
+          } else {
+            var nSx = parseInt(this.arrVerDiv[no].style.left);
+            var nSy = parseInt(this.arrVerDiv[no].style.top);
+
+            this.moveStart("y", no, nSx, nSy);
+
+            this.arrIng[no] = true; //진행
+          }
+        },
+        allStart: function () {
+          Yl.start(0);
+          Yl.start(1);
+          Yl.start(2);
+          Yl.start(3);
+          Yl.start(4);
+          Yl.start(5);
+        },
+        moveStart: function (sXy, pno, nSx, nSy) {
+          var nLen = this.arrMovDiv.length;
+
+          this.arrMovDiv[nLen] = this.getDiv("5px", "5px", this.arrColor[pno]);
+
+          this.arrMDiv[pno].push(nLen);
+
+          this.getEl("div_body").appendChild(this.arrMovDiv[nLen]);
+
+          this.arrMovDiv[nLen].style.left = nSx + "px";
+          this.arrMovDiv[nLen].style.top = nSy + "px";
+
+          this.arrMovDiv[nLen].style.zIndex = 3;
+
+          var nEx = nSx;
+          var nEy = nSy;
+          if (sXy == "y") nEy = this.nHeight + 140;
+
+          var bCk = false;
+
+          for (var i = 0; i < this.arrHorDiv.length; i++) {
+            var nx = parseInt(this.arrHorDiv[i].style.left);
+            var ny = parseInt(this.arrHorDiv[i].style.top);
+            var nw = parseInt(this.arrHorDiv[i].style.width);
+            var nh = parseInt(this.arrHorDiv[i].style.height);
+
+            if (sXy == "x") {
+              if (ny == nSy) {
+                if (nx == nSx) {
+                  nEx = nx + nw;
+                  break;
+                } else if (nx + nw == nSx) {
+                  nEx = nx;
+                  break;
+                }
+              }
+            } else {
+              //반복하면서 큰것중에서 제일 작은것으로
+              if (ny > nSy) {
+                if (nx == nEx || nx + nw == nEx) {
+                  if (bCk) {
+                    if (ny < nEy) nEy = ny;
+                  } else nEy = ny;
+
+                  bCk = true;
+                }
+              }
+            }
+          }
+
+          this.move(nLen, pno, nSx, nSy, nEx, nEy);
+        },
+        nSpeed: 5, // 속도
+        move: function (no, pno, nSx, nSy, nEx, nEy) {
+          var nx = parseInt(this.arrMovDiv[no].style.left);
+          var ny = parseInt(this.arrMovDiv[no].style.top);
+          var nw = parseInt(this.arrMovDiv[no].style.width);
+          var nh = parseInt(this.arrMovDiv[no].style.height);
+
+          var np;
+          var bIng = true;
+
+          var sXy = "";
+
+          if (nSx != nEx) {
+            np = nw + this.nSpeed;
+            if (nEx < nSx) {
+              if (nSx - np <= nEx) {
+                bIng = false;
+                np = nSx - nEx;
+              }
+              this.arrMovDiv[no].style.left = nSx - np + "px";
+            } else {
+              if (nSx + np >= nEx) {
+                bIng = false;
+                np = nEx - nSx;
+              }
+            }
+
+            this.arrMovDiv[no].style.height = "4px";
+            this.arrMovDiv[no].style.width = np + "px";
+
+            sXy = "x";
+          } else {
+            np = nh + this.nSpeed;
+            if (nSy + np >= nEy) {
+              bIng = false;
+              np = nEy - nSy;
+            }
+
+            this.arrMovDiv[no].style.width = "4px";
+            this.arrMovDiv[no].style.height = np + "px";
+
+            sXy = "y";
+          }
+
+          if (bIng) {
+            setTimeout(
+              "Yl.move(" +
+                no +
+                "," +
+                pno +
+                "," +
+                nSx +
+                "," +
+                nSy +
+                "," +
+                nEx +
+                "," +
+                nEy +
+                ")",
+              1
+            );
+          } else {
+            if (sXy == "x") this.arrMovDiv[no].style.height = "5px";
+            else this.arrMovDiv[no].style.width = "5px";
+
+            if (nEy < this.nHeight + 100) {
+              this.moveStart(sXy == "x" ? "y" : "x", pno, nEx, nEy);
+            } else {
+              //   for (var i = 0; i < this.arrVerDiv.length; i++) {
+              //     if (nEx == parseInt(this.arrVerDiv[i].style.left)) {
+              //       this.arrBotDiv[i].innerHTML =
+              //         "<b>" +
+              //         (pno + 1) +
+              //         "</b><br>" +
+              //         this.arrBotDiv[i].innerHTML;
+              //       this.arrGoDiv[pno].innerHTML =
+              //         '<input type="button" value="확인" onClick="Yl.start(' +
+              //         pno +
+              //         ')">';
+              //       break;
+              //     }
+              //   }
+            }
+          }
+        },
+      };
+
+      //F5 새로고침 막기
+      document.onkeydown = function (e) {
+        if (!e) e = window.event;
+        if (e.keyCode == 116) {
+          if (confirm("새로 고침 하시겠습니까?")) {
+          } else {
+            e.keyCode = 0;
+            return false;
+          }
+        }
+      };
+
+      window.onload = function () {
+        Yl.init();
+      };
+    </script>
+  </head>
+
+  <body>
+    <!-- <div id="div_step2" style="font-size: 15px; margin-bottom: 20px">
+      입력후 게임 시작
+      <input type="button" value="시작" onclick="Yl.create();" />
+    </div> -->
+    <div id="title">사다리 타기</div>
+
+    <div
+      id="div_body"
+      style="width: 100vw; height: 9vh; position: relative"
+    ></div>
+    <div id="btnAndResultDiv" style="display: none; height: 0px">
+      <input type="text" id="inp_top_0" value="GO" tabindex="1" />
+      <input type="text" id="inp_top_1" value="GO" tabindex="2" />
+      <input type="text" id="inp_top_2" value="GO" tabindex="3" />
+      <input type="text" id="inp_top_3" value="GO" tabindex="4" />
+      <input type="text" id="inp_top_4" value="GO" tabindex="5" />
+      <input type="text" id="inp_top_5" value="GO" tabindex="6" />
+      <input type="text" id="inp_bot_0" value="A" tabindex="51" />
+      <input type="text" id="inp_bot_1" value="B" tabindex="52" />
+      <input type="text" id="inp_bot_2" value="C" tabindex="53" />
+      <input type="text" id="inp_bot_3" value="D" tabindex="54" />
+      <input type="text" id="inp_bot_4" value="E" tabindex="55" />
+      <input type="text" id="inp_bot_5" value="F" tabindex="56" />
+    </div>
+  </body>
+</html>
