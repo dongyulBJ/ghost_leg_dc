@@ -64,3 +64,10 @@ body {
   font-style: normal;
   font-size: 76px;
 }
+
+.logo {
+  width: 100vw;
+  height: 100vw;
+  max-width: 200px;
+  max-height: 200px;
+}
