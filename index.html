@@ -147,12 +147,9 @@
             this.arrTopDiv[i].innerHTML =
               '<input class="go_btn"  type="button" value="' +
               this.getEl("inp_top_" + i).value +
-              '" onClick="Yl.allStart()">';
-            // '<input class="go_btn"  type="button" value="' +
-            // this.getEl("inp_top_" + i).value +
-            // '" onClick="Yl.start(' +
-            // i +
-            // ')">';
+              '" onClick="Yl.start(' +
+              i +
+              ')">';
 
             //   i + 1 + "<br>" + this.getEl("inp_top_" + i).value;
             // this.arrBotDiv[i].innerHTML = this.getEl("inp_bot_" + i).value;
@@ -420,7 +417,9 @@
       입력후 게임 시작
       <input type="button" value="시작" onclick="Yl.create();" />
     </div> -->
-    <div id="title">사다리 타기</div>
+    <div id="title">
+      <img src=
+    </div>
 
     <div
       id="div_body"
