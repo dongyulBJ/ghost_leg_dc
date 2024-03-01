@@ -65,7 +65,7 @@ body {
   font-size: 76px;
 }
 
-.logo {
+#logo {
   width: 100vw;
   height: 100vw;
   max-width: 200px;
