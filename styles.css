@@ -18,7 +18,7 @@
 
 .result {
   width: 13vw;
-  height: 10vw;
+  height: 20vw;
   max-width: 200px;
   max-height: 100px;
   font-family: "Dongle", sans-serif;
@@ -29,7 +29,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 50;
   word-break: keep-all;
 }
 
